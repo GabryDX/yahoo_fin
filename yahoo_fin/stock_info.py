@@ -61,7 +61,7 @@ def _convert_to_numeric(s):
         elif "B" in s:
             s = s.strip("B")
             out = force_float(s) * 1_000_000_000
-            
+
         else:  # must not contain M or B
             out = force_float(s)
     else:
@@ -652,7 +652,7 @@ def get_top_crypto():
                                                                strip("+").\
                                                                replace(",", "")))
     del df["52 Week Range"]
-    del df["1 Day Chart"]
+    del df["Day Chart"]
     
     fields_to_change = [x for x in df.columns.tolist() if "Volume" in x \
                         or x == "Market Cap" or x == "Circulating Supply"]
