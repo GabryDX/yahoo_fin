@@ -32,7 +32,7 @@ base_url = "https://query1.finance.yahoo.com/v8/finance/chart/"
 default_headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
 
-def build_url(ticker, start_date = None, end_date = None, interval = "1d"):
+def build_url(ticker, start_date=None, end_date=None, interval="1d"):
 
     if end_date is None:
         end_seconds = int(pd.Timestamp("now").timestamp())
@@ -100,15 +100,12 @@ def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
     if interval not in ("1d", "1wk", "1mo", "1m"):
         raise AssertionError("interval must be of of '1d', '1wk', '1mo', or '1m'")
 
-
     # build and connect to URL
     site, params = build_url(ticker, start_date, end_date, interval)
     resp = requests.get(site, params = params, headers = headers)
 
-
     if not resp.ok:
         raise AssertionError(resp.json())
-
 
     # get JSON response
     data = resp.json()
@@ -120,18 +117,14 @@ def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
     temp_time = data["chart"]["result"][0]["timestamp"]
 
     if interval != "1m":
-
         # add in adjclose
         frame["adjclose"] = data["chart"]["result"][0]["indicators"]["adjclose"][0]["adjclose"]
         frame.index = pd.to_datetime(temp_time, unit = "s")
         frame.index = frame.index.map(lambda dt: dt.floor("d"))
         frame = frame[["open", "high", "low", "close", "adjclose", "volume"]]
-
     else:
-
         frame.index = pd.to_datetime(temp_time, unit = "s")
         frame = frame[["open", "high", "low", "close", "volume"]]
-
 
     frame['ticker'] = ticker.upper()
 
@@ -142,7 +135,7 @@ def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
     return frame
 
 
-def tickers_sp500(include_company_data = False):
+def tickers_sp500(include_company_data=False):
     '''Downloads list of tickers currently listed in the S&P 500 '''
     # get list of all S&P 500 stocks
     sp500 = pd.read_html("https://en.wikipedia.org/wiki/List_of_S%26P_500_companies")[0]
@@ -157,8 +150,7 @@ def tickers_sp500(include_company_data = False):
     return sp_tickers
 
 
-def tickers_nasdaq(include_company_data = False):
-
+def tickers_nasdaq(include_company_data=False):
     '''Downloads list of tickers currently listed in the NASDAQ'''
 
     ftp = ftplib.FTP("ftp.nasdaqtrader.com")
@@ -176,7 +168,6 @@ def tickers_nasdaq(include_company_data = False):
     info = r.getvalue().decode()
     splits = info.split("|")
 
-
     tickers = [x for x in splits if "\r\n" in x]
     tickers = [x.split("\r\n")[1] for x in tickers if "NASDAQ" not in x != "\r\n"]
     tickers = [ticker for ticker in tickers if "File" not in ticker]
@@ -186,7 +177,7 @@ def tickers_nasdaq(include_company_data = False):
     return tickers
 
 
-def tickers_other(include_company_data = False):
+def tickers_other(include_company_data=False):
     '''Downloads list of tickers currently listed in the "otherlisted.txt"
        file on "ftp.nasdaqtrader.com" '''
     ftp = ftplib.FTP("ftp.nasdaqtrader.com")
@@ -213,8 +204,7 @@ def tickers_other(include_company_data = False):
     return tickers
 
 
-def tickers_dow(include_company_data = False):
-
+def tickers_dow(include_company_data=False):
     '''Downloads list of currently traded tickers on the Dow'''
 
     site = "https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average"
@@ -229,7 +219,7 @@ def tickers_dow(include_company_data = False):
     return dow_tickers
 
 
-def tickers_ibovespa(include_company_data = False):
+def tickers_ibovespa(include_company_data=False):
 
     '''Downloads list of currently traded tickers on the Ibovespa, Brazil'''
 
@@ -244,7 +234,7 @@ def tickers_ibovespa(include_company_data = False):
     return ibovespa_tickers
 
 
-def tickers_nifty50(include_company_data = False, headers = {'User-agent': 'Mozilla/5.0'}):
+def tickers_nifty50(include_company_data=False, headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Downloads list of currently traded tickers on the NIFTY 50, India'''
 
@@ -266,11 +256,11 @@ def tickers_niftybank():
     return niftybank
 
 
-def tickers_ftse100(include_company_data = False):
+def tickers_ftse100(include_company_data=False):
 
     '''Downloads a list of the tickers traded on the FTSE 100 index'''
 
-    table = pd.read_html("https://en.wikipedia.org/wiki/FTSE_100_Index", attrs = {"id": "constituents"})[0]
+    table = pd.read_html("https://en.wikipedia.org/wiki/FTSE_100_Index", attrs={"id": "constituents"})[0]
 
     if include_company_data:
         return table
@@ -278,10 +268,10 @@ def tickers_ftse100(include_company_data = False):
     return sorted(table.EPIC.tolist())
 
 
-def tickers_ftse250(include_company_data = False):
+def tickers_ftse250(include_company_data=False):
     '''Downloads a list of the tickers traded on the FTSE 250 index'''
 
-    table = pd.read_html("https://en.wikipedia.org/wiki/FTSE_250_Index", attrs = {"id": "constituents"})[0]
+    table = pd.read_html("https://en.wikipedia.org/wiki/FTSE_250_Index", attrs={"id": "constituents"})[0]
 
     table.columns = ["Company", "Ticker"]
 
@@ -291,7 +281,7 @@ def tickers_ftse250(include_company_data = False):
     return sorted(table.Ticker.tolist())
 
 
-def get_quote_table(ticker , dict_result = True, headers = {'User-agent': 'Mozilla/5.0'}):
+def get_quote_table(ticker, dict_result=True, headers={'User-agent': 'Mozilla/5.0'}):
     '''Scrapes data elements found on Yahoo Finance's quote page
        of input ticker
     
@@ -320,13 +310,13 @@ def get_quote_table(ticker , dict_result = True, headers = {'User-agent': 'Mozil
 
     if dict_result:
 
-        result = {key : val for key,val in zip(data.attribute , data.value)}
+        result = {key: val for key, val in zip(data.attribute, data.value)}
         return result
 
     return data
 
 
-def get_stats(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
+def get_stats(ticker, headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Scrapes information from the statistics tab on Yahoo Finance
        for an input ticker 
@@ -336,7 +326,6 @@ def get_stats(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
 
     stats_site = "https://finance.yahoo.com/quote/" + ticker + \
                  "/key-statistics?p=" + ticker
-
 
     tables = pd.read_html(requests.get(stats_site, headers=headers).text)
 
@@ -348,12 +337,12 @@ def get_stats(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
 
     table.columns = ["Attribute" , "Value"]
 
-    table = table.reset_index(drop = True)
+    table = table.reset_index(drop=True)
 
     return table
 
 
-def get_stats_valuation(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
+def get_stats_valuation(ticker, headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Scrapes Valuation Measures table from the statistics tab on Yahoo Finance
        for an input ticker 
@@ -364,13 +353,11 @@ def get_stats_valuation(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
     stats_site = "https://finance.yahoo.com/quote/" + ticker + \
                  "/key-statistics?p=" + ticker
 
-
     tables = pd.read_html(requests.get(stats_site, headers=headers).text)
 
     tables = [table for table in tables if "Trailing P/E" in table.iloc[:,0].tolist()]
 
-
-    table = tables[0].reset_index(drop = True)
+    table = tables[0].reset_index(drop=True)
 
     return table
 
@@ -443,7 +430,7 @@ def _decrypt_yblob_aes(data):
     return decoded_stores
 
 
-def _parse_json(url, headers = {'User-agent': 'Mozilla/5.0'}):
+def _parse_json(url, headers={'User-agent': 'Mozilla/5.0'}):
     html = requests.get(url=url, headers = headers).text
 
     json_str = html.split('root.App.main =')[1].split('(this)')[0].split(';\n}')[0].strip()
@@ -478,7 +465,7 @@ def _parse_table(json_info):
     return df
 
 
-def get_income_statement(ticker, yearly = True):
+def get_income_statement(ticker, yearly=True):
 
     '''Scrape income statement from Yahoo Finance for a given ticker
     
@@ -501,7 +488,7 @@ def get_income_statement(ticker, yearly = True):
     return _parse_table(temp)
 
 
-def get_balance_sheet(ticker, yearly = True):
+def get_balance_sheet(ticker, yearly=True):
 
     '''Scrapes balance sheet from Yahoo Finance for an input ticker
     
@@ -510,7 +497,6 @@ def get_balance_sheet(ticker, yearly = True):
 
     balance_sheet_site = "https://finance.yahoo.com/quote/" + ticker + \
                          "/balance-sheet?p=" + ticker
-
 
     json_info = _parse_json(balance_sheet_site)
 
@@ -525,7 +511,7 @@ def get_balance_sheet(ticker, yearly = True):
     return _parse_table(temp)
 
 
-def get_cash_flow(ticker, yearly = True):
+def get_cash_flow(ticker, yearly=True):
 
     '''Scrapes the cash flow statement from Yahoo Finance for an input ticker
     
@@ -534,7 +520,6 @@ def get_cash_flow(ticker, yearly = True):
 
     cash_flow_site = "https://finance.yahoo.com/quote/" + \
             ticker + "/cash-flow?p=" + ticker
-
 
     json_info = _parse_json(cash_flow_site)
 
@@ -546,7 +531,7 @@ def get_cash_flow(ticker, yearly = True):
     return _parse_table(temp)
 
 
-def get_financials(ticker, yearly = True, quarterly = True):
+def get_financials(ticker, yearly=True, quarterly=True):
 
     '''Scrapes financials data from Yahoo Finance for an input ticker, including
        balance sheet, cash flow statement, and income statement.  Returns dictionary
@@ -568,7 +553,6 @@ def get_financials(ticker, yearly = True, quarterly = True):
     result = {}
 
     if yearly:
-
         temp = json_info["incomeStatementHistory"]["incomeStatementHistory"]
         table = _parse_table(temp)
         result["yearly_income_statement"] = table
@@ -597,7 +581,7 @@ def get_financials(ticker, yearly = True, quarterly = True):
     return result
 
 
-def get_holders(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
+def get_holders(ticker, headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Scrapes the Holders page from Yahoo Finance for an input ticker
     
@@ -617,7 +601,7 @@ def get_holders(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
     return table_mapper
 
 
-def get_analysts_info(ticker, headers = {'User-agent': 'Mozilla/5.0'}):
+def get_analysts_info(ticker, headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Scrapes the Analysts page from Yahoo Finance for an input ticker
     
@@ -688,17 +672,14 @@ def _raw_get_daily_info(site):
 
 
 def get_day_most_active(count: int = 100):
-
     return _raw_get_daily_info(f"https://finance.yahoo.com/most-active?offset=0&count={count}")
 
 
 def get_day_gainers(count: int = 100):
-
     return _raw_get_daily_info(f"https://finance.yahoo.com/gainers?offset=0&count={count}")
 
 
 def get_day_losers(count: int = 100):
-
     return _raw_get_daily_info(f"https://finance.yahoo.com/losers?offset=0&count={count}")
 
 
@@ -913,7 +894,7 @@ def get_earnings_history(ticker):
     return result["context"]["dispatcher"]["stores"]["ScreenerResultsStore"]["results"]["rows"]
 
 
-def get_earnings_for_date(date, offset = 0, count = 1):
+def get_earnings_for_date(date, offset=0, count=1):
 
     '''Inputs: @date
        Returns a dictionary of stock tickers with earnings expected on the
@@ -977,7 +958,7 @@ def get_earnings_in_date_range(start_date, end_date):
     return earnings_data
 
 
-def get_currencies(headers = {'User-agent': 'Mozilla/5.0'}):
+def get_currencies(headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Returns the currencies table from Yahoo Finance'''
 
@@ -989,7 +970,7 @@ def get_currencies(headers = {'User-agent': 'Mozilla/5.0'}):
     return result
 
 
-def get_futures(headers = {'User-agent': 'Mozilla/5.0'}):
+def get_futures(headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Returns the futures table from Yahoo Finance'''
 
@@ -1001,7 +982,7 @@ def get_futures(headers = {'User-agent': 'Mozilla/5.0'}):
     return result
 
 
-def get_undervalued_large_caps(headers = {'User-agent': 'Mozilla/5.0'}):
+def get_undervalued_large_caps(headers={'User-agent': 'Mozilla/5.0'}):
 
     '''Returns the undervalued large caps table from Yahoo Finance'''
 

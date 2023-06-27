@@ -1,5 +1,3 @@
-
-
 import pandas as pd
 import numpy as np
 import requests
@@ -11,13 +9,13 @@ except Exception:
 
 
 def force_float(elt):
-    
     try:
         return float(elt)
     except:
         return elt
 
-def build_options_url(ticker, date = None):
+
+def build_options_url(ticker, date=None):
     
     """Constructs the URL pointing to options chain"""
        
@@ -28,7 +26,8 @@ def build_options_url(ticker, date = None):
 
     return url
 
-def get_options_chain(ticker, date = None, raw = True, headers = {'User-agent': 'Mozilla/5.0'}):
+
+def get_options_chain(ticker, date=None, raw=True, headers={'User-agent': 'Mozilla/5.0'}):
     
     """Extracts call / put option tables for input ticker and expiration date.  If
        no date is input, the default result will be the earliest expiring
@@ -53,19 +52,16 @@ def get_options_chain(ticker, date = None, raw = True, headers = {'User-agent': 
         calls["% Change"] = calls["% Change"].map(lambda num: num / 100 if isinstance(num, float) else 0)
         calls["Volume"] = calls["Volume"].str.replace("-", "0").map(force_float)
         calls["Open Interest"] = calls["Open Interest"].str.replace("-", "0").map(force_float)
-        
-        
+
         puts["% Change"] = puts["% Change"].str.strip("%").map(force_float)
         puts["% Change"] = puts["% Change"].map(lambda num: num / 100 if isinstance(num, float) else 0)
         puts["Volume"] =puts["Volume"].str.replace("-", "0").map(force_float)
         puts["Open Interest"] = puts["Open Interest"].str.replace("-", "0").map(force_float)
-        
-    
-    
+
     return {"calls": calls, "puts":puts}    
     
     
-def get_calls(ticker, date = None):
+def get_calls(ticker, date=None):
 
     """Extracts call option table for input ticker and expiration date
     
@@ -76,9 +72,8 @@ def get_calls(ticker, date = None):
     
     return options_chain["calls"]
     
-    
 
-def get_puts(ticker, date = None):
+def get_puts(ticker, date=None):
 
     """Extracts put option table for input ticker and expiration date
     
@@ -112,17 +107,3 @@ def get_expiration_dates(ticker):
     session.close()
     
     return dates
-    
-
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
