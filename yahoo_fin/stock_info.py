@@ -33,16 +33,13 @@ default_headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1
 
 
 def build_url(ticker, start_date=None, end_date=None, interval="1d"):
-
     if end_date is None:
         end_seconds = int(pd.Timestamp("now").timestamp())
-
     else:
         end_seconds = int(pd.Timestamp(end_date).timestamp())
 
     if start_date is None:
         start_seconds = 7223400
-
     else:
         start_seconds = int(pd.Timestamp(start_date).timestamp())
 
@@ -80,9 +77,7 @@ def _convert_to_numeric(s):
     return out
 
 
-def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
-             interval="1d", headers=None
-             ):
+def get_data(ticker, start_date=None, end_date=None, index_as_date=True, interval="1d", headers=None):
     '''Downloads historical stock price data into a pandas data frame.  Interval
        must be "1d", "1wk", "1mo", or "1m" for daily, weekly, monthly, or minute data.
        Intraday minute data is limited to 7 days.
@@ -102,7 +97,7 @@ def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
 
     # build and connect to URL
     site, params = build_url(ticker, start_date, end_date, interval)
-    resp = requests.get(site, params = params, headers = headers)
+    resp = requests.get(site, params=params, headers=headers)
 
     if not resp.ok:
         raise AssertionError(resp.json())
@@ -130,7 +125,7 @@ def get_data(ticker, start_date=None, end_date=None, index_as_date=True,
 
     if not index_as_date:
         frame = frame.reset_index()
-        frame.rename(columns = {"index": "date"}, inplace = True)
+        frame.rename(columns={"index": "date"}, inplace = True)
 
     return frame
 
@@ -248,6 +243,7 @@ def tickers_nifty50(include_company_data=False, headers={'User-agent': 'Mozilla/
 
     return nifty50
 
+
 def tickers_niftybank():
     ''' Currently traded tickers on the NIFTY BANK, India '''
 
@@ -279,6 +275,18 @@ def tickers_ftse250(include_company_data=False):
         return table
 
     return sorted(table.Ticker.tolist())
+
+
+def tickers_ftse_mib(include_company_data=False):
+
+    '''Downloads a list of the tickers traded on the FTSE MIB index'''
+
+    table = pd.read_html("https://en.wikipedia.org/wiki/FTSE_MIB", attrs={"id": "constituents"})[0]
+
+    if include_company_data:
+        return table
+
+    return sorted(table.EPIC.tolist())
 
 
 def get_quote_table(ticker, dict_result=True, headers={'User-agent': 'Mozilla/5.0'}):
