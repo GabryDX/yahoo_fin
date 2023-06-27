@@ -261,7 +261,7 @@ def tickers_ftse100(include_company_data=False):
     if include_company_data:
         return table
 
-    return sorted(table.EPIC.tolist())
+    return sorted(table.Ticker.tolist())
 
 
 def tickers_ftse250(include_company_data=False):
@@ -286,7 +286,7 @@ def tickers_ftse_mib(include_company_data=False):
     if include_company_data:
         return table
 
-    return sorted(table.EPIC.tolist())
+    return sorted(table.Ticker.tolist())
 
 
 def get_quote_table(ticker, dict_result=True, headers={'User-agent': 'Mozilla/5.0'}):
