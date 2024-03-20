@@ -6,7 +6,6 @@ import re
 import json
 import datetime
 import numpy as np
-
 # Needed for decrypting
 import base64
 import hashlib
@@ -14,6 +13,8 @@ import hashlib
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
 from requests.utils import default_headers
+# For pretty print
+from pprint import pp
 
 
 try:
@@ -21,10 +22,10 @@ try:
 except Exception:
     print("""Warning - Certain functionality 
              requires requests_html, which is not installed.
-             
+
              Install using:
              pip install requests_html
-             
+
              After installation, you may have to restart your Python session.""")
 
 
@@ -858,7 +859,7 @@ def get_earnings(ticker):
 
     result["quarterly_revenue_earnings"] = pd.DataFrame.from_dict(temp["financialsChart"]["quarterly"])
 
-    return result
+    return pp(result)
 
 
 ### Earnings functions
